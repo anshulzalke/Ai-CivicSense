@@ -1,0 +1,5 @@
+source /Users/anshulzalke/Desktop/AICivicSense_AI/.venv/bin/activate
+
+Agar activate ho gaya toh prompt ke start mein ye dikhna chahiye:
+
+yolo predict model=runs/pothole_roadcrack_v1/weights/best.pt source="Img (339).jpg" conf=0.25 device=mps

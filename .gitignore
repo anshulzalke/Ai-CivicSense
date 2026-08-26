@@ -1,0 +1,11 @@
+ai-service/dataset/
+ai-service/runs/
+ai-service/pothole_cracks_detector/runs/
+ai-service/venv/
+ai-service/__pycache__/
+civicsense-backend/node_modules/
+civicsense-prototype/node_modules/
+civicsense-prototype/dist/
+**/__pycache__/
+.DS_Store
+*.log

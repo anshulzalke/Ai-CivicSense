@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: #F7F5EF;
+  color: #16233D;
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #E8A33D;
+  color: #16233D;
+}
+
+:focus-visible {
+  outline: 2px solid #C77F1F;
+  outline-offset: 2px;
+}
+
+.paper-texture {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(22,35,61,0.05) 1px, transparent 0);
+  background-size: 18px 18px;
+}
+
+.seal-ring {
+  background-image: repeating-conic-gradient(#16233D 0deg 3deg, transparent 3deg 12deg);
+  border-radius: 9999px;
+}
+
+.ticket-notch {
+  position: relative;
+}
+.ticket-notch::before,
+.ticket-notch::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #F7F5EF;
+  border-radius: 9999px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.ticket-notch::before { left: -8px; }
+.ticket-notch::after { right: -8px; }
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(193,68,58,0.45); }
+  70% { box-shadow: 0 0 0 14px rgba(193,68,58,0); }
+  100% { box-shadow: 0 0 0 0 rgba(193,68,58,0); }
+}
+.sos-pulse { animation: pulse-ring 2s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sos-pulse { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* Simple custom scrollbar for the queue lists */
+.thin-scroll::-webkit-scrollbar { width: 6px; }
+.thin-scroll::-webkit-scrollbar-thumb { background: #8C9AB8; border-radius: 4px; }
+
+/* Custom Leaflet Map styling */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 25px -5px rgba(22, 35, 61, 0.25) !important;
+  border: 1px solid rgba(22, 35, 61, 0.08) !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-content {
+  margin: 8px 10px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: none !important;
+  border: 1px solid rgba(22, 35, 61, 0.08) !important;
+}
+
+.custom-leaflet-pin {
+  background: transparent !important;
+  border: none !important;
+}
+
