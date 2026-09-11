@@ -9,3 +9,6 @@ civicsense-prototype/dist/
 **/__pycache__/
 .DS_Store
 *.log
+civicsense-backend/src/uploads/*
+civicsense-backend/src/uploads/*
+backend/src/uploads/.gitkeep
