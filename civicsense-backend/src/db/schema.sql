@@ -2,6 +2,16 @@
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+DROP TABLE IF EXISTS complaints CASCADE;
+DROP TABLE IF EXISTS officials CASCADE;
+DROP TABLE IF EXISTS audit_log CASCADE;
+DROP TABLE IF EXISTS points_of_interest CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS departments CASCADE;
+
+DROP TYPE IF EXISTS complaint_status CASCADE;
+DROP TYPE IF EXISTS user_role CASCADE;
+
 CREATE TYPE user_role AS ENUM ('citizen', 'official', 'admin');
 CREATE TYPE complaint_status AS ENUM (
   'submitted',
@@ -48,17 +58,21 @@ CREATE TABLE complaints (
   severity             SMALLINT NOT NULL CHECK (severity BETWEEN 1 AND 5),
   lat                  DOUBLE PRECISION NOT NULL,
   lng                  DOUBLE PRECISION NOT NULL,
+  status               complaint_status NOT NULL DEFAULT 'submitted',
+  citizen_id           UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  assigned_officer_id  UUID REFERENCES officials(id) ON DELETE SET NULL,
+  escalation_level     SMALLINT NOT NULL DEFAULT 0 CHECK (escalation_level BETWEEN 0 AND 3),
   image_url            TEXT,
+  audio_url            TEXT,
   resolution_note      TEXT,
   resolution_image_url TEXT,
   rating               SMALLINT CHECK (rating BETWEEN 1 AND 5),
   citizen_feedback     TEXT,
   reopened_reason      TEXT,
   flagged_by           TEXT,
-  citizen_satisfied    BOOLEAN,
+  citizen_satisfied    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
   last_action_at       TIMESTAMPTZ NOT NULL DEFAULT now()
-
 );
 
 CREATE INDEX idx_complaints_category ON complaints(category);
@@ -80,3 +94,4 @@ CREATE TABLE points_of_interest (
   lat   DOUBLE PRECISION NOT NULL,
   lng   DOUBLE PRECISION NOT NULL
 );
+
