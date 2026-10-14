@@ -18,3 +18,4 @@ ai-service/runs/
 ai-service/test_samples/
 *.pt
 !yolov8n.pt
+/yolov8n.pt
