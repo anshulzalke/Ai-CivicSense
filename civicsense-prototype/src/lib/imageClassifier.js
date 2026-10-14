@@ -43,6 +43,10 @@ async function classifyWithFastAPI(dataUrl, fileMeta = {}) {
       formData.append("file", blob, fileMeta?.name || "image.jpg");
     }
 
+    if (fileMeta?.category) {
+      formData.append("category", fileMeta.category);
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3500);
 
@@ -60,20 +64,36 @@ async function classifyWithFastAPI(dataUrl, fileMeta = {}) {
     const data = await res.json();
 
     if (data.detected) {
-      const cat = data.category || (data.damage_type === "garbage" ? "garbage" : "potholes");
+      const rawCat = String(data.category || data.damage_type || "").toLowerCase();
+      const cat = rawCat.includes("light") || rawCat.includes("lamp")
+        ? "streetlights"
+        : rawCat.includes("drain") || rawCat.includes("manhole")
+        ? "drainage"
+        : rawCat.includes("garb") || rawCat.includes("waste")
+        ? "garbage"
+        : "potholes";
+
       const isGarbage = cat === "garbage";
+      const isDrainage = cat === "drainage";
+      const isStreetlight = cat === "streetlights";
       const isCrack = data.damage_type === "crack";
 
       let labelKey = data.label_key;
       if (!labelKey) {
-        labelKey = isGarbage ? "ai_garbage_label" : (isCrack ? "ai_crack_label" : "ai_pothole_label");
+        if (isDrainage) labelKey = "ai_drainage_label";
+        else if (isStreetlight) labelKey = "ai_streetlight_label";
+        else if (isGarbage) labelKey = "ai_garbage_label";
+        else if (isCrack) labelKey = "ai_crack_label";
+        else labelKey = "ai_pothole_label";
       }
 
       let suggestedTitleKey = data.suggested_title_key;
       if (!suggestedTitleKey) {
-        suggestedTitleKey = isGarbage
-          ? "ai_garbage_suggested_title"
-          : (isCrack ? "ai_crack_suggested_title" : "ai_pothole_suggested_title");
+        if (isDrainage) suggestedTitleKey = "ai_drainage_suggested_title";
+        else if (isStreetlight) suggestedTitleKey = "ai_streetlight_suggested_title";
+        else if (isGarbage) suggestedTitleKey = "ai_garbage_suggested_title";
+        else if (isCrack) suggestedTitleKey = "ai_crack_suggested_title";
+        else suggestedTitleKey = "ai_pothole_suggested_title";
       }
 
       let defaultBox = { x: 18, y: 24, width: 64, height: 52 };
@@ -81,24 +101,38 @@ async function classifyWithFastAPI(dataUrl, fileMeta = {}) {
         defaultBox = { x: 22, y: 32, width: 56, height: 38 };
       } else if (isGarbage) {
         defaultBox = { x: 20, y: 26, width: 60, height: 50 };
+      } else if (isDrainage) {
+        defaultBox = { x: 15, y: 20, width: 68, height: 56 };
+      } else if (isStreetlight) {
+        defaultBox = { x: 30, y: 12, width: 38, height: 72 };
       }
 
       const confDecimal = ((data.confidence || 90) / 100).toFixed(2);
+      const defaultLabel = isCrack
+        ? `crack ${confDecimal}`
+        : isGarbage
+        ? `garbage ${confDecimal}`
+        : isDrainage
+        ? `drainage ${confDecimal}`
+        : isStreetlight
+        ? `streetlight ${confDecimal}`
+        : `pothole ${confDecimal}`;
+
       const singleBox = data.box || {
         left: defaultBox.x,
         top: defaultBox.y,
         width: defaultBox.width,
         height: defaultBox.height,
-        label: isCrack ? `crack ${confDecimal}` : (isGarbage ? `garbage ${confDecimal}` : `pothole ${confDecimal}`),
-        severity: data.severity || (isCrack ? 1 : (isGarbage ? 3 : 4)),
+        label: defaultLabel,
+        severity: data.severity || (isDrainage ? 5 : (isCrack ? 1 : (isGarbage ? 2 : 4))),
         confidence: data.confidence || 90,
       };
 
       return {
         isCivicAnomaly: true,
         category: cat,
-        damageType: data.damage_type || (isCrack ? "crack" : "pothole"),
-        severity: data.severity || (isCrack ? 1 : (isGarbage ? 3 : 4)),
+        damageType: data.damage_type || (isDrainage ? "drainage" : (isStreetlight ? "streetlight" : (isCrack ? "crack" : "pothole"))),
+        severity: data.severity || (isDrainage ? 5 : (isCrack ? 1 : (isGarbage ? 2 : (isStreetlight ? 3 : 4)))),
         confidence: data.confidence || (isCrack ? 22.0 : 93.4),
         box: singleBox,
         labelKey,
@@ -106,13 +140,26 @@ async function classifyWithFastAPI(dataUrl, fileMeta = {}) {
         suggestedTitle: data.suggested_title || (
           isCrack
             ? "Road surface alligator cracking observed - preventive seal coating needed"
-            : (isGarbage
-                ? "Overflowing municipal garbage container on roadside"
-                : "Road pothole observed - asphalt patching required")
+            : isGarbage
+            ? "Overflowing municipal garbage container on roadside"
+            : isDrainage
+            ? "Severe open drainage and water stagnation observed"
+            : isStreetlight
+            ? "Damaged non-functional public streetlight pole"
+            : "Road pothole observed - asphalt patching required"
         ),
-        boxLabel: singleBox.label || (isCrack ? `crack ${confDecimal}` : `pothole ${confDecimal}`),
-        estimatedArea: data.estimated_area || (isCrack ? "~0.4m²" : (isGarbage ? "~2.4m²" : "~1.4m²")),
-        depthLevel: data.depth_level || (isCrack ? "Low / Superficial" : (isGarbage ? "Moderate" : "Moderate / Medium")),
+        explanation: data.explanation || (
+          isDrainage
+            ? "AI detected open sewer/waterlogged drain cavity posing safety hazards."
+            : isStreetlight
+            ? "AI detected broken/non-functional streetlight luminaire."
+            : isGarbage
+            ? "AI detected municipal solid waste clutter and garbage heap."
+            : "AI verified road surface defect with high priority severity classification."
+        ),
+        boxLabel: singleBox.label || defaultLabel,
+        estimatedArea: data.estimated_area || (isCrack ? "~0.4m²" : (isGarbage ? "~2.4m²" : (isDrainage ? "~1.8m²" : "~1.4m²"))),
+        depthLevel: data.depth_level || (isDrainage ? "Critical Safety Hazard (Level 5)" : (isCrack ? "Low / Superficial" : (isGarbage ? "Moderate" : "Moderate / Medium"))),
         anomalyDetails: {
           source: "FastAPI YOLOv8 Server (best.pt + OpenCV)",
           rawLabel: data.raw_label,
@@ -120,6 +167,7 @@ async function classifyWithFastAPI(dataUrl, fileMeta = {}) {
           modelConfidence: data.confidence,
           estimatedArea: data.estimated_area,
           depthLevel: data.depth_level,
+          description: data.explanation || (isDrainage ? "AI detected open sewer/waterlogged drain cavity posing safety hazards." : null),
           metrics: data.metrics,
         },
       };
@@ -568,14 +616,14 @@ export async function classifyCivicImageLocal(dataUrl, fileMeta = {}) {
 
   // Case D1: Drainage
   if (bestCategory === "drainage") {
-    const severity = waterRatio > 0.28 ? 5 : 4;
-    const confidence = parseFloat((92.1 + Math.random() * 4.4).toFixed(1));
+    const severity = 5;
+    const confidence = parseFloat((91.5 + Math.random() * 2.5).toFixed(1));
 
     return {
       isCivicAnomaly: true,
       category: "drainage",
       damageType: "drainage",
-      severity,
+      severity: 5,
       confidence,
       box: {
         x: 15,
@@ -585,12 +633,13 @@ export async function classifyCivicImageLocal(dataUrl, fileMeta = {}) {
       },
       labelKey: "ai_drainage_label",
       suggestedTitleKey: "ai_drainage_suggested_title",
-      suggestedTitle: "Severely flooded storm drain and waterlogged roadway",
+      suggestedTitle: "Severe open drainage and water stagnation observed",
+      explanation: "AI detected open sewer/waterlogged drain cavity posing safety hazards.",
       pixelStats,
       anomalyDetails: {
         type: "drainage",
         source: "Client-side Visual Classifier (Fallback)",
-        floodSeverity: severity >= 5 ? "Critical Roadway Submersion" : "Storm Drain Backflow",
+        floodSeverity: "Critical Safety Hazard (Level 5)",
       },
     };
   }

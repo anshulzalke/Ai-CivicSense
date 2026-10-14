@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { toBoxPercent, severityColor, deriveEscalation } from "../lib/logic";
+import { toBoxPercent, severityColor, deriveEscalation, getCategoryMarkerColor } from "../lib/logic";
 import { POIS } from "../lib/mockData";
 
 // Placeholder live-map view. Renders complaint + POI positions on a
@@ -44,7 +44,7 @@ export default function MiniMap({ complaints, height = 340, onSelect }) {
         if (!c) return null;
         const { x, y } = toBoxPercent(c.lat, c.lng);
         const { effectiveLevel } = deriveEscalation(c);
-        const color = severityColor(c.severity || 3);
+        const color = getCategoryMarkerColor(c.category);
         const isHovered = hovered === c.token;
         return (
           <button

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Layers, Filter, MapPin, Flame } from "lucide-react";
-import { deriveEscalation, severityColor, severityLabel } from "../lib/logic";
+import { deriveEscalation, severityColor, severityLabel, getCategoryMarkerColor } from "../lib/logic";
 import HeatmapLayer from "./HeatmapLayer";
 import { useLanguage } from "../context/LanguageContext";
 import { getImageUrl } from "../lib/api";
@@ -260,7 +260,7 @@ export default function LiveLeafletMap({
           ) : (
             filteredComplaints.map((c) => {
               const { effectiveStatus, effectiveLevel } = deriveEscalation(c);
-              const color = severityColor(c.severity);
+              const color = getCategoryMarkerColor(c.category);
               const isEscalated = effectiveLevel > 0 && c.status !== "closed";
               const pinIcon = createCustomPin(color, c.severity, isEscalated);
               const categoryName = getCategoryLabel(c.category);
@@ -359,15 +359,18 @@ export default function LiveLeafletMap({
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-3 text-[11px] text-ink-800">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#C1443A]" /> {t("cat_potholes")}
+            <div className="flex items-center gap-3 text-[11px] text-ink-800 flex-wrap">
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" /> {t("cat_potholes")}
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#4C7A5E]" /> {t("cat_garbage")}
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" /> {t("cat_garbage")}
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#3D4C6B]" /> {t("cat_drainage")}
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#06B6D4]" /> {t("cat_drainage")}
+              </span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /> {t("cat_streetlights") || "Streetlight"}
               </span>
             </div>
           )}

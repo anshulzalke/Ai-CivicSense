@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FilePlus2, Coins, CheckCircle2, MapPin } from "lucide-react";
 import { useApp } from "../../context/AppContext";
@@ -9,8 +9,9 @@ import { deriveEscalation } from "../../lib/logic";
 
 export default function CitizenHome() {
   const { citizen, user, complaints = [] } = useApp();
-  const { t } = useLanguage();
+  const { t, getCategoryLabel } = useLanguage();
   const navigate = useNavigate();
+  const [mapCategory, setMapCategory] = useState("all");
 
   const citizenId = citizen?.id || user?.id || citizen?.govId || user?.govId || "cit-1";
   const citizenGovId = citizen?.govId || user?.govId;
@@ -27,6 +28,14 @@ export default function CitizenHome() {
   const needsValidation = mine.filter((c) => c.status === "resolved_pending_validation");
   const active = mine.filter((c) => !["closed", "resolved_pending_validation"].includes(c.status));
   const closed = mine.filter((c) => c.status === "closed");
+
+  const categoryChips = [
+    { id: "all", label: t("cat_all") || "All", color: "bg-slate-500" },
+    { id: "potholes", label: getCategoryLabel("potholes"), color: "bg-[#EF4444]" },
+    { id: "garbage", label: getCategoryLabel("garbage"), color: "bg-[#10B981]" },
+    { id: "drainage", label: getCategoryLabel("drainage"), color: "bg-[#06B6D4]" },
+    { id: "streetlights", label: getCategoryLabel("streetlights"), color: "bg-[#F59E0B]" },
+  ];
 
   return (
     <div>
@@ -76,7 +85,7 @@ export default function CitizenHome() {
 
       {/* Main Dashboard Live Leaflet Map */}
       <div className="mb-10">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
           <div>
             <h2 className="font-display text-lg font-semibold text-ink-900 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-moss-600 animate-pulse" />
@@ -84,11 +93,34 @@ export default function CitizenHome() {
             </h2>
             <p className="text-xs text-slate2 mt-0.5">{t("section_live_map_sub")}</p>
           </div>
+
+          {/* 4 Category Filter Chips */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {categoryChips.map((chip) => {
+              const active = mapCategory === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => setMapCategory(chip.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                    active
+                      ? "bg-ink-900 text-paper shadow-xs"
+                      : "bg-white border border-ink-100 text-slate2 hover:border-ink-300 hover:text-ink-900"
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${chip.color}`} />
+                  <span>{chip.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <LiveLeafletMap
           complaints={mine}
           height={380}
+          selectedCategory={mapCategory}
+          onCategoryChange={setMapCategory}
           onSelectToken={(token) => navigate(`/citizen/track?token=${token}`)}
         />
       </div>

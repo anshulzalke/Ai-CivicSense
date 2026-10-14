@@ -71,7 +71,13 @@ export default function GovQueue(props) {
     props?.userDept ||
     user?.department ||
     user?.dept ||
-    (emailStr.includes("deshmukh") ? "garbage" : emailStr.includes("bhosale") ? "drainage" : "potholes")
+    (emailStr.includes("deshmukh")
+      ? "garbage"
+      : emailStr.includes("bhosale") || emailStr.includes("drain")
+      ? "drainage"
+      : emailStr.includes("jadhav") || emailStr.includes("light") || emailStr.includes("electric")
+      ? "streetlights"
+      : "potholes")
   ).toLowerCase().trim();
 
   const userDept = rawDept;
@@ -101,7 +107,12 @@ export default function GovQueue(props) {
     ) {
       return "drainage";
     }
-    if (emailStr.includes("light") || emailStr.includes("street")) {
+    if (
+      emailStr.includes("jadhav") ||
+      emailStr.includes("light") ||
+      emailStr.includes("street") ||
+      nameStr.includes("jadhav")
+    ) {
       return "streetlights";
     }
     if (
@@ -282,38 +293,29 @@ export default function GovQueue(props) {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap items-center">
-          {!isSuperAdminOrZonal && officerDept ? (
-            <div className="flex items-center gap-2 bg-ink-900 text-paper text-xs font-mono font-semibold px-3.5 py-1.5 rounded-full shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Dept Scoped: {getCategoryLabel(officerDept).toUpperCase()}</span>
-            </div>
-          ) : (
-            <>
+          {[
+            { id: "all", label: t("cat_all") || "All Queues", dot: "bg-slate-400" },
+            { id: "potholes", label: "Roads & Potholes", dot: "bg-[#EF4444]" },
+            { id: "garbage", label: "Solid Waste / Garbage", dot: "bg-[#10B981]" },
+            { id: "drainage", label: "Water & Drainage", dot: "bg-[#06B6D4]" },
+            { id: "streetlights", label: "Electrical / Streetlight", dot: "bg-[#F59E0B]" },
+          ].map((tab) => {
+            const isSelected = dept === tab.id;
+            return (
               <button
-                onClick={() => setDept("all")}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                  dept === "all"
-                    ? "bg-ink-900 text-paper shadow-xs"
-                    : "bg-white border border-ink-100 text-slate2 hover:border-ink-300"
+                key={tab.id}
+                onClick={() => setDept(tab.id)}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  isSelected
+                    ? "bg-ink-900 text-paper shadow-xs font-semibold"
+                    : "bg-white border border-ink-100 text-slate2 hover:border-ink-300 hover:text-ink-900"
                 }`}
               >
-                {t("cat_all")}
+                <span className={`w-2 h-2 rounded-full ${tab.dot}`} />
+                <span>{tab.label}</span>
               </button>
-              {(departments || []).map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => setDept(d.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                    dept === d.id
-                      ? "bg-ink-900 text-paper shadow-xs"
-                      : "bg-white border border-ink-100 text-slate2 hover:border-ink-300"
-                  }`}
-                >
-                  {getCategoryLabel(d.id)}
-                </button>
-              ))}
-            </>
-          )}
+            );
+          })}
         </div>
       </div>
 

@@ -11,6 +11,9 @@ import {
   Check,
   Mic,
   MicOff,
+  Lightbulb,
+  Droplets,
+  Trash2,
 } from "lucide-react";
 import CameraCapture from "../../components/CameraCapture";
 import Seal from "../../components/Seal";
@@ -172,7 +175,8 @@ export default function FileComplaint() {
 
     const startTime = Date.now();
     try {
-      const result = await classifyCivicImage(dataUrl, fileMeta);
+      const enhancedMeta = { ...fileMeta, category };
+      const result = await classifyCivicImage(dataUrl, enhancedMeta);
       const elapsed = Date.now() - startTime;
       const remainingDelay = Math.max(0, 1100 - elapsed);
 
@@ -180,13 +184,24 @@ export default function FileComplaint() {
         setDetection(result);
         if (result.isCivicAnomaly) {
           if (result.category) {
-            setCategory(result.category);
+            const rawCat = String(result.category).toLowerCase();
+            const normalizedCat = rawCat.includes("light") || rawCat.includes("lamp")
+              ? "streetlights"
+              : rawCat.includes("drain") || rawCat.includes("manhole")
+              ? "drainage"
+              : rawCat.includes("garb") || rawCat.includes("waste")
+              ? "garbage"
+              : "potholes";
+            setCategory(normalizedCat);
           }
           if (result.severity) {
             setSeverity(result.severity);
           }
-          if (!title.trim() && result.suggestedTitleKey) {
-            setTitle(t(result.suggestedTitleKey) || result.suggestedTitle);
+          if (!title.trim()) {
+            setTitle(result.suggestedTitle || (result.suggestedTitleKey ? t(result.suggestedTitleKey) : ""));
+          }
+          if (!description.trim() && result.explanation) {
+            setDescription(result.explanation);
           }
           setIsOverriddenCategory(false);
           setIsOverriddenSeverity(false);
@@ -342,7 +357,9 @@ export default function FileComplaint() {
         {t("file_title")}
       </h1>
       <p className="text-sm text-slate2 mb-6">
-        {t("file_subtitle")}
+        {t("file_subtitle") && t("file_subtitle") !== "file_subtitle"
+          ? t("file_subtitle")
+          : "Report urban civic issues with automated AI verification and priority routing."}
       </p>
 
       {submitError && (
@@ -395,8 +412,8 @@ export default function FileComplaint() {
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <h4 className="text-sm font-semibold text-ink-900 font-display">
                     {detection.isCivicAnomaly
-                      ? t("ai_detected_title")
-                      : t("ai_no_anomaly_title")}
+                      ? (detection.suggestedTitle || (t("ai_detected_title") !== "ai_detected_title" ? t("ai_detected_title") : "Severe open drainage and water stagnation observed"))
+                      : (t("ai_no_anomaly_title") !== "ai_no_anomaly_title" ? t("ai_no_anomaly_title") : "No Civic Anomaly Detected")}
                   </h4>
                   <span
                     className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-full border ${
@@ -405,20 +422,20 @@ export default function FileComplaint() {
                         : "bg-signal-100 text-signal-800 border-signal-300"
                     }`}
                   >
-                    {t("ai_confidence_badge")} {detection.confidence}%
+                    {(t("ai_confidence_badge") !== "ai_confidence_badge" ? t("ai_confidence_badge") : "Confidence")} {detection.confidence}%
                   </span>
                 </div>
                 <p className="text-xs text-slate2 mt-1 leading-relaxed">
                   {detection.isCivicAnomaly
-                    ? t("ai_detected_desc")
-                    : t("ai_no_anomaly_desc")}
+                    ? (detection.explanation || (t("ai_detected_desc") !== "ai_detected_desc" ? t("ai_detected_desc") : "AI detected open sewer/waterlogged drain cavity posing safety hazards."))
+                    : (t("ai_no_anomaly_desc") !== "ai_no_anomaly_desc" ? t("ai_no_anomaly_desc") : "Image analysis did not detect significant road damage, garbage, or drainage anomalies.")}
                 </p>
 
                 {detection.isCivicAnomaly && (
                   <div className="mt-3 pt-3 border-t border-moss-200/60 flex items-center justify-between gap-3 text-xs font-mono">
                     <div className="flex items-center gap-2">
                       <span className="text-slate2">
-                        {t("ai_auto_category")}:
+                        {(t("ai_auto_category") !== "ai_auto_category" ? t("ai_auto_category") : "AI Suggested Category")}:
                       </span>
                       <strong className="text-ink-900 bg-white/80 px-2 py-0.5 rounded border border-moss-200">
                         {getCategoryLabel(detection.category)}
@@ -426,7 +443,7 @@ export default function FileComplaint() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-slate2">
-                        {t("ai_auto_severity")}:
+                        {(t("ai_auto_severity") !== "ai_auto_severity" ? t("ai_auto_severity") : "AI Auto Severity")}:
                       </span>
                       <strong className="text-ink-900 bg-white/80 px-2 py-0.5 rounded border border-moss-200">
                         {detection.severity}/5
@@ -451,16 +468,22 @@ export default function FileComplaint() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {(departments || []).map((dept) => {
-              const isSelected = category === dept.id;
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {[
+              { id: "potholes", name: "Potholes", icon: AlertTriangle, iconColor: "text-red-500" },
+              { id: "garbage", name: "Garbage", icon: Trash2, iconColor: "text-emerald-500" },
+              { id: "drainage", name: "Drainage", icon: Droplets, iconColor: "text-cyan-500" },
+              { id: "streetlights", name: "Streetlight", icon: Lightbulb, iconColor: "text-amber-500" },
+            ].map((catItem) => {
+              const isSelected = category === catItem.id || (catItem.id === "streetlights" && (category === "streetlight" || category === "Streetlight"));
+              const IconComp = catItem.icon;
               return (
                 <button
-                  key={dept.id}
+                  key={catItem.id}
                   type="button"
                   onClick={() => {
-                    setCategory(dept.id);
-                    if (aiState === "done" && detection?.category !== dept.id) {
+                    setCategory(catItem.id);
+                    if (aiState === "done" && detection?.category !== catItem.id) {
                       setIsOverriddenCategory(true);
                     } else {
                       setIsOverriddenCategory(false);
@@ -472,8 +495,11 @@ export default function FileComplaint() {
                       : "border-ink-100 bg-white hover:border-ink-300 text-ink-900"
                   }`}
                 >
-                  <span className="truncate">{getCategoryLabel(dept.id)}</span>
-                  {isSelected && <Check size={14} className="shrink-0 ml-1" />}
+                  <div className="flex items-center gap-2 truncate">
+                    <IconComp size={16} className={isSelected ? "text-paper" : catItem.iconColor} />
+                    <span className="truncate">{getCategoryLabel(catItem.id)}</span>
+                  </div>
+                  {isSelected && <Check size={14} className="shrink-0 ml-1 text-paper" />}
                 </button>
               );
             })}

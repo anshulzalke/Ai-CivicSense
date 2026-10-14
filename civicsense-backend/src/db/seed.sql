@@ -1,9 +1,16 @@
 -- Seed data — mirrors src/lib/mockData.js in the frontend prototype
 
 INSERT INTO departments (id, name, color) VALUES
-  ('potholes', 'Potholes', '#C1443A'),
-  ('garbage', 'Garbage', '#4C7A5E'),
-  ('drainage', 'Drainage', '#3D4C6B');
+  ('potholes', 'Roads & Infrastructure', '#C1443A'),
+  ('garbage', 'Solid Waste Management', '#4C7A5E'),
+  ('drainage', 'Water & Drainage', '#3D4C6B'),
+  ('streetlights', 'Electrical & Lighting', '#E8A33D'),
+  ('Potholes', 'Roads & Infrastructure', '#C1443A'),
+  ('Garbage', 'Solid Waste Management', '#4C7A5E'),
+  ('Drainage', 'Water & Drainage', '#3D4C6B'),
+  ('Streetlight', 'Electrical & Lighting', '#E8A33D'),
+  ('streetlight', 'Electrical & Lighting', '#E8A33D')
+ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO points_of_interest (name, type, lat, lng) VALUES
   ('Sassoon General Hospital', 'hospital', 18.5227, 73.8636),
@@ -17,3 +24,4 @@ VALUES ('00000000-0000-0000-0000-000000000001', 'citizen', 'Anshul Zalke', 'GOV-
 
 -- Demo staff accounts — password for all seeded staff is: civicsense123
 -- (bcrypt hash generated at seed time via src/db/setup.js, see that script)
+

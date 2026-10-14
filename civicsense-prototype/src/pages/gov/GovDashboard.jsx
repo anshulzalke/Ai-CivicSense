@@ -13,7 +13,13 @@ export default function GovDashboard(props) {
     props?.userDept ||
     user?.department ||
     user?.dept ||
-    (emailStr.includes("deshmukh") ? "garbage" : emailStr.includes("bhosale") ? "drainage" : "potholes")
+    (emailStr.includes("deshmukh")
+      ? "garbage"
+      : emailStr.includes("bhosale") || emailStr.includes("drain")
+      ? "drainage"
+      : emailStr.includes("jadhav") || emailStr.includes("light") || emailStr.includes("electric")
+      ? "streetlights"
+      : "potholes")
   ).toLowerCase();
   const userDept = rawDept;
   const userRole = props?.userRole || user?.role || authState?.role || "L1";

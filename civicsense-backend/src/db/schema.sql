@@ -23,7 +23,7 @@ CREATE TYPE complaint_status AS ENUM (
 );
 
 CREATE TABLE departments (
-  id           TEXT PRIMARY KEY,           -- 'potholes' | 'garbage' | 'drainage'
+  id           TEXT PRIMARY KEY,           -- 'Potholes' | 'Garbage' | 'Drainage' | 'Streetlight' | 'potholes' | 'garbage' | 'drainage' | 'streetlights'
   name         TEXT NOT NULL,
   color        TEXT NOT NULL DEFAULT '#3D4C6B'
 );
@@ -52,7 +52,7 @@ CREATE TABLE officials (
 
 CREATE TABLE complaints (
   token                TEXT PRIMARY KEY,   -- e.g. CVX-2026-000123
-  category             TEXT NOT NULL REFERENCES departments(id),
+  category             TEXT NOT NULL REFERENCES departments(id) CHECK (category IN ('Potholes', 'Garbage', 'Drainage', 'Streetlight', 'potholes', 'garbage', 'drainage', 'streetlights', 'streetlight')),
   title                TEXT NOT NULL,
   description          TEXT,
   severity             SMALLINT NOT NULL CHECK (severity BETWEEN 1 AND 5),

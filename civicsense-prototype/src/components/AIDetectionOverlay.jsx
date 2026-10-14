@@ -26,9 +26,13 @@ export default function AIDetectionOverlay({
 
   const defaultLabel = detection?.damageType === "crack"
     ? `crack ${(confidence / 100).toFixed(2)}`
-    : (detection?.damageType === "garbage"
-        ? `garbage ${(confidence / 100).toFixed(2)}`
-        : `pothole ${(confidence / 100).toFixed(2)}`);
+    : detection?.damageType === "garbage"
+    ? `garbage ${(confidence / 100).toFixed(2)}`
+    : detection?.damageType === "drainage"
+    ? `drainage ${(confidence / 100).toFixed(2)}`
+    : (detection?.damageType === "streetlight" || detection?.damageType === "streetlights")
+    ? `streetlight ${(confidence / 100).toFixed(2)}`
+    : `pothole ${(confidence / 100).toFixed(2)}`;
 
   const boxLabel = box?.label || detection?.boxLabel || defaultLabel;
 

@@ -23,6 +23,7 @@ async function run() {
       { name: "R. Kulkarni", email: "r.kulkarni@civicsense.gov.in", dept: "potholes", level: 1 },
       { name: "S. Deshmukh", email: "s.deshmukh@civicsense.gov.in", dept: "garbage", level: 1 },
       { name: "A. Bhosale", email: "a.bhosale@civicsense.gov.in", dept: "drainage", level: 1 },
+      { name: "P. Jadhav", email: "p.jadhav@civicsense.gov.in", dept: "streetlights", level: 1 },
       { name: "Zonal Officer — East", email: "zonal.east@civicsense.gov.in", dept: "potholes", level: 2 },
       { name: "Divisional Commissioner", email: "commissioner@civicsense.gov.in", dept: "potholes", level: 3 },
     ];
@@ -87,6 +88,18 @@ async function run() {
         createdAt: hoursAgo(120),
         lastActionAt: hoursAgo(70),
         officer: "A. Bhosale",
+      },
+      {
+        category: "streetlights",
+        title: "Broken streetlight on Wagholi main road",
+        description: "Non-functional streetlight causing darkness on busy road near school zone.",
+        severity: 3,
+        lat: 18.5750,
+        lng: 73.9750,
+        status: "submitted",
+        createdAt: hoursAgo(18),
+        lastActionAt: hoursAgo(18),
+        officer: "P. Jadhav",
       },
     ];
 

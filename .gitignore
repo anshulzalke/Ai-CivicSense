@@ -12,3 +12,9 @@ civicsense-prototype/dist/
 civicsense-backend/src/uploads/*
 civicsense-backend/src/uploads/*
 backend/src/uploads/.gitkeep
+Garbage/
+runs/
+ai-service/runs/
+ai-service/test_samples/
+*.pt
+!yolov8n.pt

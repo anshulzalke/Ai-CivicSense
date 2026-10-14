@@ -26,12 +26,46 @@ function decorate(complaint, pois) {
   };
 }
 
+export function getDepartmentForCategory(category) {
+  const c = String(category || "").toLowerCase();
+  if (c.includes("light") || c.includes("lamp") || c.includes("electric")) {
+    return {
+      id: "streetlights",
+      name: "Electrical & Lighting",
+      aliases: ["streetlights", "streetlight", "Streetlight", "Streetlights", "Electrical & Lighting", "electrical", "lighting"]
+    };
+  }
+  if (c.includes("drain") || c.includes("water") || c.includes("manhole") || c.includes("sewer")) {
+    return {
+      id: "drainage",
+      name: "Water & Drainage",
+      aliases: ["drainage", "Drainage", "Water & Drainage", "water", "sewage", "waterlogging"]
+    };
+  }
+  if (c.includes("garb") || c.includes("waste") || c.includes("trash") || c.includes("sanitation")) {
+    return {
+      id: "garbage",
+      name: "Solid Waste Management",
+      aliases: ["garbage", "Garbage", "Solid Waste Management", "sanitation", "solid_waste", "waste"]
+    };
+  }
+  return {
+    id: "potholes",
+    name: "Roads & Infrastructure",
+    aliases: ["potholes", "pothole", "Potholes", "Roads & Infrastructure", "road_damage", "infrastructure"]
+  };
+}
+
 export function getDepartmentCategories(dept) {
   const map = {
-    potholes: ["potholes", "road_damage", "infrastructure"],
-    garbage: ["garbage", "sanitation", "solid_waste"],
-    drainage: ["drainage", "water", "sewage"],
-    streetlights: ["streetlights", "electrical", "lighting"],
+    potholes: ["potholes", "pothole", "Potholes", "road_damage", "infrastructure", "Roads & Infrastructure"],
+    garbage: ["garbage", "Garbage", "sanitation", "solid_waste", "waste", "Solid Waste Management"],
+    drainage: ["drainage", "Drainage", "water", "sewage", "waterlogging", "Water & Drainage"],
+    streetlights: ["streetlights", "streetlight", "Streetlight", "Streetlights", "electrical", "lighting", "Electrical & Lighting"],
+    "Electrical & Lighting": ["streetlights", "streetlight", "Streetlight", "Streetlights", "electrical", "lighting", "Electrical & Lighting"],
+    "Water & Drainage": ["drainage", "Drainage", "water", "sewage", "waterlogging", "Water & Drainage"],
+    "Roads & Infrastructure": ["potholes", "pothole", "Potholes", "road_damage", "infrastructure", "Roads & Infrastructure"],
+    "Solid Waste Management": ["garbage", "Garbage", "sanitation", "solid_waste", "waste", "Solid Waste Management"],
   };
   return map[dept] || [dept];
 }
@@ -140,11 +174,12 @@ export async function fileComplaint(req, res, next) {
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
     const audioUrl = audio_url || audio_base64 || audio || null;
 
-    // Route to the department's most junior available officer for the demo;
-    // a real system would balance load or use officer availability/schedule.
+    // Route to the department's most junior available officer for the demo:
+    // 'Streetlight' -> 'Electrical & Lighting', 'Drainage' -> 'Water & Drainage'
+    const deptInfo = getDepartmentForCategory(category);
     const officerRes = await pool.query(
-      "SELECT id FROM officials WHERE department = $1 ORDER BY level ASC LIMIT 1",
-      [category]
+      "SELECT id FROM officials WHERE department = ANY($1) ORDER BY level ASC LIMIT 1",
+      [deptInfo.aliases]
     );
     const officerId = officerRes.rows[0]?.id || null;
 
@@ -286,9 +321,10 @@ export async function validateResolution(req, res, next) {
       const starRating = rating ? Number(rating) : 1;
 
       // Automatically re-assign to higher level officer if available
+      const deptCats = getDepartmentCategories(complaint.category);
       const { rows: higherOfficers } = await pool.query(
-        `SELECT id, level FROM officials WHERE department = $1 AND level >= 2 ORDER BY level DESC LIMIT 1`,
-        [complaint.category]
+        `SELECT id, level FROM officials WHERE department = ANY($1) AND level >= 2 ORDER BY level DESC LIMIT 1`,
+        [deptCats]
       );
       const higherOfficerId = higherOfficers[0]?.id || complaint.assigned_officer_id;
       const newLevel = Math.min((complaint.escalation_level || 0) + 1, 3);
@@ -326,9 +362,10 @@ export async function flagResolution(req, res, next) {
     if (!complaint) return res.status(404).json({ error: "Complaint not found" });
 
     // Escalated status and assign higher level official
+    const deptCats = getDepartmentCategories(complaint.category);
     const { rows: higherOfficers } = await pool.query(
-      `SELECT id, level FROM officials WHERE department = $1 AND level >= 2 ORDER BY level DESC LIMIT 1`,
-      [complaint.category]
+      `SELECT id, level FROM officials WHERE department = ANY($1) AND level >= 2 ORDER BY level DESC LIMIT 1`,
+      [deptCats]
     );
     const higherOfficerId = higherOfficers[0]?.id || complaint.assigned_officer_id;
     const newLevel = Math.min((complaint.escalation_level || 0) + 1, 3);
