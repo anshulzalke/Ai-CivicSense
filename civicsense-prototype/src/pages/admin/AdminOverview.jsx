@@ -36,12 +36,6 @@ export function matchesDepartment(category, deptId) {
   if (target === "garbage" || target === "solid_waste") {
     return ["garbage", "solid_waste", "sanitation", "waste"].includes(normalized);
   }
-  if (target === "streetlights" || target === "streetlight") {
-    return ["streetlights", "streetlight", "electrical", "electricity", "lighting"].includes(normalized);
-  }
-  if (target === "drainage" || target === "water") {
-    return ["drainage", "water", "waterlogging", "sewage", "flooding"].includes(normalized);
-  }
   return normalized === target;
 }
 
@@ -49,8 +43,6 @@ const DEPT_PILLS = [
   { id: "all", label: "All Departments", icon: "🏛️" },
   { id: "potholes", label: "Road & Potholes", icon: "🛣️" },
   { id: "garbage", label: "Solid Waste / Garbage", icon: "🗑️" },
-  { id: "streetlights", label: "Electrical / Streetlight", icon: "💡" },
-  { id: "drainage", label: "Water & Drainage", icon: "🚰" },
 ];
 
 export default function AdminOverview() {

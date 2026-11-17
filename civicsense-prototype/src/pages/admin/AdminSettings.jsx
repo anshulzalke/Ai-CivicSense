@@ -337,7 +337,7 @@ export default function AdminSettings() {
               </div>
             ))}
             <p className="text-xs text-slate2 mt-2">
-              Garbage, Sanitation, Drainage, and Streetlights inherit municipal escalation architecture.
+              Roads &amp; Infrastructure and Solid Waste Management inherit municipal escalation architecture.
             </p>
           </div>
         )}

@@ -28,25 +28,25 @@ function decorate(complaint, pois) {
 
 export function getDepartmentForCategory(category) {
   const c = String(category || "").toLowerCase();
-  if (c.includes("light") || c.includes("lamp") || c.includes("electric")) {
-    return {
-      id: "streetlights",
-      name: "Electrical & Lighting",
-      aliases: ["streetlights", "streetlight", "Streetlight", "Streetlights", "Electrical & Lighting", "electrical", "lighting"]
-    };
-  }
-  if (c.includes("drain") || c.includes("water") || c.includes("manhole") || c.includes("sewer")) {
-    return {
-      id: "drainage",
-      name: "Water & Drainage",
-      aliases: ["drainage", "Drainage", "Water & Drainage", "water", "sewage", "waterlogging"]
-    };
-  }
   if (c.includes("garb") || c.includes("waste") || c.includes("trash") || c.includes("sanitation")) {
     return {
       id: "garbage",
       name: "Solid Waste Management",
       aliases: ["garbage", "Garbage", "Solid Waste Management", "sanitation", "solid_waste", "waste"]
+    };
+  }
+  if (c.includes("drain") || c.includes("water") || c.includes("sewage")) {
+    return {
+      id: "drainage",
+      name: "Drainage & Water Supply",
+      aliases: ["drainage", "Drainage", "potholes", "Potholes", "Roads & Infrastructure"]
+    };
+  }
+  if (c.includes("light") || c.includes("lamp") || c.includes("electric")) {
+    return {
+      id: "streetlight",
+      name: "Electrical & Street Lighting",
+      aliases: ["streetlight", "Streetlight", "potholes", "Potholes", "Roads & Infrastructure"]
     };
   }
   return {
@@ -60,10 +60,8 @@ export function getDepartmentCategories(dept) {
   const map = {
     potholes: ["potholes", "pothole", "Potholes", "road_damage", "infrastructure", "Roads & Infrastructure"],
     garbage: ["garbage", "Garbage", "sanitation", "solid_waste", "waste", "Solid Waste Management"],
-    drainage: ["drainage", "Drainage", "water", "sewage", "waterlogging", "Water & Drainage"],
-    streetlights: ["streetlights", "streetlight", "Streetlight", "Streetlights", "electrical", "lighting", "Electrical & Lighting"],
-    "Electrical & Lighting": ["streetlights", "streetlight", "Streetlight", "Streetlights", "electrical", "lighting", "Electrical & Lighting"],
-    "Water & Drainage": ["drainage", "Drainage", "water", "sewage", "waterlogging", "Water & Drainage"],
+    drainage: ["drainage", "Drainage", "potholes", "Potholes"],
+    streetlight: ["streetlight", "Streetlight", "potholes", "Potholes"],
     "Roads & Infrastructure": ["potholes", "pothole", "Potholes", "road_damage", "infrastructure", "Roads & Infrastructure"],
     "Solid Waste Management": ["garbage", "Garbage", "sanitation", "solid_waste", "waste", "Solid Waste Management"],
   };
@@ -174,8 +172,8 @@ export async function fileComplaint(req, res, next) {
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
     const audioUrl = audio_url || audio_base64 || audio || null;
 
-    // Route to the department's most junior available officer for the demo:
-    // 'Streetlight' -> 'Electrical & Lighting', 'Drainage' -> 'Water & Drainage'
+    // Route to the department's most junior available officer:
+    // Potholes -> Roads & Infrastructure (R. Kulkarni), Garbage -> Solid Waste Management (S. Deshmukh)
     const deptInfo = getDepartmentForCategory(category);
     const officerRes = await pool.query(
       "SELECT id FROM officials WHERE department = ANY($1) ORDER BY level ASC LIMIT 1",

@@ -9,12 +9,6 @@ export function distanceMeters(lat1, lng1, lat2, lng2) {
 }
 
 export const CATEGORY_SLA_HOURS = {
-  drainage: 24,
-  Drainage: 24,
-  streetlights: 48,
-  streetlight: 48,
-  Streetlight: 48,
-  Streetlights: 48,
   potholes: 48,
   Potholes: 48,
   garbage: 72,
@@ -24,8 +18,6 @@ export const CATEGORY_SLA_HOURS = {
 export function getCategorySLAHours(category) {
   if (!category) return 48;
   const c = String(category).toLowerCase();
-  if (c.includes("drain") || c.includes("manhole") || c.includes("waterlog") || c.includes("sewer")) return 24;
-  if (c.includes("light") || c.includes("lamp") || c.includes("electric")) return 48;
   if (c.includes("garb") || c.includes("waste") || c.includes("trash") || c.includes("sanitation")) return 72;
   if (c.includes("pothole") || c.includes("crack") || c.includes("road")) return 48;
   return 48;
@@ -34,9 +26,7 @@ export function getCategorySLAHours(category) {
 export function getDefaultSeverity(category) {
   if (!category) return 3;
   const c = String(category).toLowerCase();
-  if (c.includes("drain") || c.includes("manhole") || c.includes("waterlog")) return 5;
   if (c.includes("pothole") || c.includes("road")) return 4;
-  if (c.includes("light") || c.includes("lamp") || c.includes("electric")) return 3;
   if (c.includes("garb") || c.includes("waste") || c.includes("trash")) return 2;
   return 3;
 }
@@ -44,8 +34,6 @@ export function getDefaultSeverity(category) {
 const TERMINAL_STATUSES = ["resolved_pending_validation", "closed", "reopened"];
 
 // Derives the *effective* status/escalation purely from timestamps & category SLA:
-// - Drainage: 24 hours (Level 5 Emergency)
-// - Streetlight: 48 hours (Level 3)
 // - Potholes: 48 hours (Level 4)
 // - Garbage: 72 hours (Level 2)
 export function deriveEscalation(complaint) {

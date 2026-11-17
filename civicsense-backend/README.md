@@ -30,11 +30,10 @@ audit logging all verified working before packaging.
    npm run db:setup
    ```
    This creates all tables, seeds departments/POIs, a demo citizen
-   (`gov_id: GOV-XXXX-1187`), 5 seeded staff accounts, and 3 sample
+   (`gov_id: GOV-XXXX-1187`), 4 seeded staff accounts, and 2 sample
    complaints. **Seeded staff password: `civicsense123`** for all of:
    - r.kulkarni@civicsense.gov.in (Potholes, L1)
    - s.deshmukh@civicsense.gov.in (Garbage, L1)
-   - a.bhosale@civicsense.gov.in (Drainage, L1)
    - zonal.east@civicsense.gov.in (Potholes, L2)
    - commissioner@civicsense.gov.in (Potholes, L3)
    - admin@civicsense.gov.in (Admin)

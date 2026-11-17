@@ -26,8 +26,6 @@ import VoiceNotePlayer from "./VoiceNotePlayer";
 const CATEGORY_FALLBACK_IMAGES = {
   potholes: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=1000&q=80",
   garbage: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1000&q=80",
-  drainage: "https://images.unsplash.com/photo-1541888946425-d0fbb18fe2b1?auto=format&fit=crop&w=1000&q=80",
-  streetlights: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1000&q=80",
 };
 
 export default function CitizenPhotoEvidence({

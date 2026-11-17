@@ -7,8 +7,6 @@ export const PUNE_BOUNDS = {
 export const DEPARTMENTS = [
   { id: "potholes", name: "Potholes", color: "#C1443A", officerCount: 3 },
   { id: "garbage", name: "Garbage", color: "#4C7A5E", officerCount: 2 },
-  { id: "drainage", name: "Drainage", color: "#3D4C6B", officerCount: 2 },
-  { id: "streetlights", name: "Streetlights", color: "#E8A33D", officerCount: 2 },
 ];
 
 // Points of interest used for priority scoring (proximity boosts severity)
@@ -22,7 +20,6 @@ export const POIS = [
 export const OFFICIALS = [
   { id: "off-1", name: "R. Kulkarni", dept: "potholes", level: 1 },
   { id: "off-2", name: "S. Deshmukh", dept: "garbage", level: 1 },
-  { id: "off-3", name: "A. Bhosale", dept: "drainage", level: 1 },
   { id: "off-4", name: "Zonal Officer — East", dept: "potholes", level: 2 },
   { id: "off-5", name: "Divisional Commissioner", dept: "potholes", level: 3 },
 ];
@@ -129,29 +126,29 @@ export const SEED_COMPLAINTS = [
   },
   {
     token: "CVX-2026-000087",
-    category: "drainage",
-    title: "Blocked drain flooding main road",
-    description: "Storm drain blocked with debris, road floods after every rain.",
+    category: "potholes",
+    title: "Deep crater and broken asphalt near Swargate",
+    description: "Deep cavity in asphalt causing two-wheelers to swerve dangerously.",
     severity: 5,
-    lat: 18.5227, lng: 73.8636,
+    lat: 18.5018, lng: 73.8586,
     status: "escalated",
     citizenId: "cit-2",
     createdAt: hoursAgo(120),
     lastActionAt: hoursAgo(70),
     escalationLevel: 1,
-    assignedOfficerId: "off-3",
-    imageUrl: "https://images.unsplash.com/photo-1541888946425-d0fbb18fe2b1?auto=format&fit=crop&w=800&q=80",
-    photoUrl: "https://images.unsplash.com/photo-1541888946425-d0fbb18fe2b1?auto=format&fit=crop&w=800&q=80",
+    assignedOfficerId: "off-1",
+    imageUrl: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
+    photoUrl: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80",
     aiDetection: {
       isCivicAnomaly: true,
-      category: "drainage",
-      damageType: "drainage",
+      category: "potholes",
+      damageType: "pothole",
       confidence: 95.6,
       severity: 5,
-      labelKey: "ai_drainage_label",
-      suggestedTitle: "Severely flooded storm drain and waterlogged roadway",
+      labelKey: "ai_pothole_label",
+      suggestedTitle: "Critical road crater / cavity causing safety hazard",
       estimatedArea: "~3.2m²",
-      depthLevel: "High / Deep",
+      depthLevel: "Critical / Deep",
       box: { x: 15, y: 20, width: 70, height: 58 },
     },
   },

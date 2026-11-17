@@ -126,7 +126,7 @@ export const TRANSLATIONS = {
     ai_show_overlay: "Show AI Box",
     ai_hide_overlay: "Hide AI Box",
     ai_no_anomaly_title: "No Civic Anomaly Detected",
-    ai_no_anomaly_desc: "⚠️ No civic infrastructure anomaly detected (Confidence: Low <15%). Please capture a clear photo of road damage, garbage dump, or broken streetlight.",
+    ai_no_anomaly_desc: "⚠️ No civic infrastructure anomaly detected (Confidence: Low <15%). Please capture a clear photo of road damage or garbage dump.",
     ai_no_anomaly_badge: "No Civic Hazard Detected",
     ai_no_anomaly_hint: "You can still choose the category and severity manually below if needed.",
     ai_detected_title: "Severe open drainage and water stagnation observed",
@@ -509,7 +509,7 @@ export const TRANSLATIONS = {
     // Landing Page
     landing_hero_title: "Every complaint gets a token.",
     landing_hero_subtitle: "Every token gets an answer.",
-    landing_hero_desc: "Report potholes, garbage, and drainage issues with a photo. AI verifies and classifies it, routes it to the right department, and escalates automatically if it sits unaddressed for 48 hours.",
+    landing_hero_desc: "Report potholes and garbage issues with a photo. AI verifies and classifies it, routes it to the right department, and escalates automatically if it sits unaddressed.",
     how_it_works_title: "How CivicSense Works",
     how_it_works_sub: "A transparent, automated 3-step pipeline from complaint to verified resolution.",
     step1_title: "Report an Issue",

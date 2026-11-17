@@ -7,7 +7,6 @@ import { useLanguage } from "../context/LanguageContext";
 const SEEDED_OFFICIALS = [
   { name: "R. Kulkarni (Potholes L1)", email: "r.kulkarni@civicsense.gov.in" },
   { name: "S. Deshmukh (Garbage L1)", email: "s.deshmukh@civicsense.gov.in" },
-  { name: "A. Bhosale (Drainage L1)", email: "a.bhosale@civicsense.gov.in" },
   { name: "Zonal Officer (Potholes L2)", email: "zonal.east@civicsense.gov.in" },
   { name: "Commissioner (Potholes L3)", email: "commissioner@civicsense.gov.in" },
 ];

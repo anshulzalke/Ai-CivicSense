@@ -192,27 +192,26 @@ export default function AIChatbotWidget() {
       q.includes("nond") ||
       q.includes("darj") ||
       q.includes("pothole") ||
-      q.includes("garbage") ||
-      q.includes("drainage");
+      q.includes("garbage");
 
     if (isFilingQuery && (q.includes("how") || q.includes("kaise") || q.includes("kase") || q.includes("file") || q.includes("report") || q.includes("new"))) {
       if (language === "hi") {
         return {
           type: "text",
-          text: "📝 **शिकायत दर्ज करने की प्रक्रिया (3 आसान चरण):**\n1. **फोटो अपलोड करें**: समस्या (गड्ढे, कचरा, ड्रेनेज) की स्पष्ट फोटो खींचें या चुनें।\n2. **AI वर्गीकरण**: AI स्वचालित रूप से गंभीरता (Severity Level 1-5) तय करता है।\n3. **सबमिट करें**: सबमिट करते ही आपको एक यूनीक **Token ID** (जैसे `CVX-2026-XXXXXX`) प्राप्त होगा और 48 घंटे का SLA टाइमर शुरू हो जाएगा।",
+          text: "📝 **शिकायत दर्ज करने की प्रक्रिया (3 आसान चरण):**\n1. **फोटो अपलोड करें**: समस्या (सड़क गड्ढे या कचरा) की स्पष्ट फोटो खींचें या चुनें।\n2. **AI वर्गीकरण**: AI स्वचालित रूप से गंभीरता (Severity Level 1-5) तय करता है।\n3. **सबमिट करें**: सबमिट करते ही आपको एक यूनीक **Token ID** (जैसे `CVX-2026-XXXXXX`) प्राप्त होगा और SLA टाइमर शुरू हो जाएगा।",
           actions: [{ label: "📝 File a New Complaint", path: "/citizen/file", icon: FilePlus2 }],
         };
       }
       if (language === "mr") {
         return {
           type: "text",
-          text: "📝 **तक्रार नोंदणी प्रक्रिया (३ सोपे टप्पे):**\n१. **फोटो जोडा**: रस्त्यावरील खड्डा, कचरा किंवा ड्रेनेजचा स्पष्ट फोटो घ्या.\n२. **AI वर्गीकरण**: AI तात्काळ गांभीर्य स्तर (Severity 1-5) निश्चित करते.\n३. **नोंदणी पूर्ण करा**: सबमिट केल्यावर तुम्हाला **Token ID** (उदा. `CVX-2026-XXXXXX`) मिळेल आणि ४८ तासांचा SLA सुरू होईल.",
+          text: "📝 **तक्रार नोंदणी प्रक्रिया (३ सोपे टप्पे):**\n१. **फोटो जोडा**: रस्त्यावरील खड्डा किंवा कचऱ्याचा स्पष्ट फोटो घ्या.\n२. **AI वर्गीकरण**: AI तात्काळ गांभीर्य स्तर (Severity 1-5) निश्चित करते.\n३. **नोंदणी पूर्ण करा**: सबमिट केल्यावर तुम्हाला **Token ID** (उदा. `CVX-2026-XXXXXX`) मिळेल आणि SLA सुरू होईल.",
           actions: [{ label: "📝 File a New Complaint", path: "/citizen/file", icon: FilePlus2 }],
         };
       }
       return {
         type: "text",
-        text: "📝 **How to File a Complaint in 3 Steps:**\n1. **Capture/Upload Photo**: Upload photo evidence of the pothole, garbage overflow, or drainage issue.\n2. **AI Classification**: AI analyzes the image to determine department routing and severity score (1-5).\n3. **Submit & Receive Token**: You will immediately receive a **Token ID** (e.g. `CVX-2026-XXXXXX`) with 48h SLA monitoring.",
+        text: "📝 **How to File a Complaint in 3 Steps:**\n1. **Capture/Upload Photo**: Upload photo evidence of the pothole or garbage overflow.\n2. **AI Classification**: AI analyzes the image to determine department routing and severity score (1-5).\n3. **Submit & Receive Token**: You will immediately receive a **Token ID** (e.g. `CVX-2026-XXXXXX`) with automated SLA monitoring.",
         actions: [{ label: "📝 File a New Complaint", path: "/citizen/file", icon: FilePlus2 }],
       };
     }
@@ -372,13 +371,6 @@ export default function AIChatbotWidget() {
           : language === "mr"
           ? "कचरा व स्वच्छता तक्रारी थेट घनकचरा व्यवस्थापन विभागाकडे रिअल-टाइम जीपीएस सह पाठवल्या जातात."
           : "Garbage overflow complaints are assigned to the Solid Waste Management field team with GPS tracking.";
-    } else if (q.includes("drainage") || q.includes("water") || q.includes("पानी") || q.includes("पाणी")) {
-      dynamicSummary =
-        language === "hi"
-          ? "ड्रेनेज और जलभराव की शिकायतें ड्रेनेज व सीवरेज बोर्ड को उच्च प्राथमिकता के साथ भेजी जाती हैं।"
-          : language === "mr"
-          ? "ड्रेनेज व सांडपाण्याच्या तक्रारी जलनिस्सारण विभागाकडे उच्च प्राधान्याने पाठवल्या जातात."
-          : "Drainage and waterlogging grievances are prioritized for the Municipal Sewerage & Stormwater team.";
     } else {
       dynamicSummary =
         language === "hi"

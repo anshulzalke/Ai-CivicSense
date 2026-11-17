@@ -33,8 +33,6 @@ export default function CitizenHome() {
     { id: "all", label: t("cat_all") || "All", color: "bg-slate-500" },
     { id: "potholes", label: getCategoryLabel("potholes"), color: "bg-[#EF4444]" },
     { id: "garbage", label: getCategoryLabel("garbage"), color: "bg-[#10B981]" },
-    { id: "drainage", label: getCategoryLabel("drainage"), color: "bg-[#06B6D4]" },
-    { id: "streetlights", label: getCategoryLabel("streetlights"), color: "bg-[#F59E0B]" },
   ];
 
   return (

@@ -3,13 +3,8 @@
 INSERT INTO departments (id, name, color) VALUES
   ('potholes', 'Roads & Infrastructure', '#C1443A'),
   ('garbage', 'Solid Waste Management', '#4C7A5E'),
-  ('drainage', 'Water & Drainage', '#3D4C6B'),
-  ('streetlights', 'Electrical & Lighting', '#E8A33D'),
   ('Potholes', 'Roads & Infrastructure', '#C1443A'),
-  ('Garbage', 'Solid Waste Management', '#4C7A5E'),
-  ('Drainage', 'Water & Drainage', '#3D4C6B'),
-  ('Streetlight', 'Electrical & Lighting', '#E8A33D'),
-  ('streetlight', 'Electrical & Lighting', '#E8A33D')
+  ('Garbage', 'Solid Waste Management', '#4C7A5E')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO points_of_interest (name, type, lat, lng) VALUES

@@ -14,15 +14,19 @@ export default function AIDetectionOverlay({
 
   if (!image) return null;
 
-  const isCivic = detection ? Boolean(detection.isCivicAnomaly) : true;
-  const confidence = detection?.confidence ?? 94;
+  const isCivic = Boolean(
+    detection &&
+    (detection.status === "detected" || detection.isCivicAnomaly) &&
+    detection.status !== "no_issue_detected"
+  );
+  const confidence = detection?.confidence ?? 0;
   const severity = detection?.severity || 3;
-  const box = detection?.box || (isCivic ? { top: 36, left: 42, width: 32, height: 38 } : null);
+  const box = isCivic ? (detection?.box || detection?.bbox || null) : null;
 
-  const bLeft = box?.left ?? box?.x ?? 42;
-  const bTop = box?.top ?? box?.y ?? 36;
-  const bWidth = box?.width ?? 32;
-  const bHeight = box?.height ?? 38;
+  const bLeft = box?.left ?? box?.x ?? 0;
+  const bTop = box?.top ?? box?.y ?? 0;
+  const bWidth = box?.width ?? 0;
+  const bHeight = box?.height ?? 0;
 
   const defaultLabel = detection?.damageType === "crack"
     ? `crack ${(confidence / 100).toFixed(2)}`
@@ -30,7 +34,7 @@ export default function AIDetectionOverlay({
     ? `garbage ${(confidence / 100).toFixed(2)}`
     : detection?.damageType === "drainage"
     ? `drainage ${(confidence / 100).toFixed(2)}`
-    : (detection?.damageType === "streetlight" || detection?.damageType === "streetlights")
+    : detection?.damageType === "streetlight"
     ? `streetlight ${(confidence / 100).toFixed(2)}`
     : `pothole ${(confidence / 100).toFixed(2)}`;
 

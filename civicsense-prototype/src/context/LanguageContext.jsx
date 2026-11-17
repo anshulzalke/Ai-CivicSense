@@ -56,20 +56,17 @@ export function LanguageProvider({ children }) {
     (cat) => {
       const normalized = (cat || "").toLowerCase();
       const map = {
-        potholes: t("cat_potholes"),
-        pothole: t("cat_potholes"),
-        road_damage: t("cat_potholes"),
-        garbage: t("cat_garbage"),
-        solid_waste: t("cat_garbage"),
-        sanitation: t("cat_sanitation") || t("cat_garbage"),
-        waste: t("cat_garbage"),
-        drainage: t("cat_drainage"),
-        drain: t("cat_drainage"),
-        streetlights: t("cat_streetlights"),
-        streetlight: t("cat_streetlights"),
-        infrastructure: t("cat_infrastructure"),
-        traffic: t("cat_traffic"),
-        all: t("cat_all"),
+        potholes: t("cat_potholes") || "Potholes",
+        pothole: t("cat_potholes") || "Potholes",
+        road_damage: t("cat_potholes") || "Potholes",
+        garbage: t("cat_garbage") || "Garbage",
+        solid_waste: t("cat_garbage") || "Garbage",
+        sanitation: t("cat_sanitation") || t("cat_garbage") || "Garbage",
+        waste: t("cat_garbage") || "Garbage",
+        drainage: t("cat_drainage") || "Drainage",
+        streetlight: t("cat_streetlight") || "Streetlight",
+        streetlights: t("cat_streetlights") || t("cat_streetlight") || "Streetlights",
+        all: t("cat_all") || "All",
       };
       return map[normalized] || cat;
     },
@@ -117,12 +114,6 @@ const defaultLanguageContext = {
       solid_waste: TRANSLATIONS?.en?.cat_garbage || "Solid Waste Management",
       sanitation: TRANSLATIONS?.en?.cat_sanitation || "Solid Waste Management",
       waste: TRANSLATIONS?.en?.cat_garbage || "Solid Waste Management",
-      drainage: TRANSLATIONS?.en?.cat_drainage || "Drainage & Sewerage",
-      drain: TRANSLATIONS?.en?.cat_drainage || "Drainage & Sewerage",
-      streetlights: TRANSLATIONS?.en?.cat_streetlights || "Streetlighting & Electrical",
-      streetlight: TRANSLATIONS?.en?.cat_streetlights || "Streetlighting & Electrical",
-      infrastructure: TRANSLATIONS?.en?.cat_infrastructure || "General Infrastructure",
-      traffic: TRANSLATIONS?.en?.cat_traffic || "Traffic & Signage",
       all: TRANSLATIONS?.en?.cat_all || "All Departments",
     };
     return map[normalized] || cat || "";

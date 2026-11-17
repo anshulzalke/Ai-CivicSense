@@ -66,7 +66,7 @@ export default function Rewards() {
     (c) => c.category === "potholes"
   ).length;
   const myGreenCount = (complaints || []).filter(
-    (c) => c.category === "garbage" || c.category === "drainage"
+    (c) => c.category === "garbage"
   ).length;
 
   // Badges Definitions with Dynamic Progress
@@ -100,7 +100,7 @@ export default function Rewards() {
       title: "Green Champion",
       icon: "🌱",
       lucideIcon: TreePine,
-      desc: "Report 2 waste dumping or drainage pollution grievances.",
+      desc: "Report 2 municipal waste dumping grievances.",
       current: Math.min(myGreenCount + 1, 2),
       target: 2,
       unlocked: myGreenCount + 1 >= 2,

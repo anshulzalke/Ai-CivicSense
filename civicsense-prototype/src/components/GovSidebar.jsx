@@ -15,7 +15,7 @@ export default function GovSidebar({ navItems: propNavItems, className = "" }) {
   const rawDept = String(
     user?.department ||
     user?.dept ||
-    (emailStr.includes("deshmukh") ? "garbage" : emailStr.includes("bhosale") ? "drainage" : "potholes")
+    (emailStr.includes("deshmukh") || emailStr.includes("garbage") || emailStr.includes("waste") ? "garbage" : "potholes")
   ).toLowerCase().trim();
   const userDept = rawDept;
   const userRole = user?.role || authState?.role || "L1";

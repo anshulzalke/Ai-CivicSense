@@ -34,8 +34,6 @@ import { getImageUrl } from "../../lib/api";
 const CATEGORY_ALIASES = {
   garbage: ["garbage", "solid_waste", "sanitation", "waste", "garbage_dump"],
   potholes: ["potholes", "pothole", "road_damage", "road", "roads", "cracks", "crack"],
-  drainage: ["drainage", "waterlogging", "sewage", "drain", "flooding", "sewer"],
-  streetlights: ["streetlights", "streetlight", "lighting", "lights", "electrical"],
 };
 
 function matchCategory(complaintCat, targetDept) {
@@ -71,12 +69,8 @@ export default function GovQueue(props) {
     props?.userDept ||
     user?.department ||
     user?.dept ||
-    (emailStr.includes("deshmukh")
+    (emailStr.includes("deshmukh") || emailStr.includes("garbage") || emailStr.includes("waste")
       ? "garbage"
-      : emailStr.includes("bhosale") || emailStr.includes("drain")
-      ? "drainage"
-      : emailStr.includes("jadhav") || emailStr.includes("light") || emailStr.includes("electric")
-      ? "streetlights"
       : "potholes")
   ).toLowerCase().trim();
 
@@ -87,8 +81,6 @@ export default function GovQueue(props) {
     if (rawDept) {
       if (CATEGORY_ALIASES.garbage.includes(rawDept)) return "garbage";
       if (CATEGORY_ALIASES.potholes.includes(rawDept)) return "potholes";
-      if (CATEGORY_ALIASES.drainage.includes(rawDept)) return "drainage";
-      if (CATEGORY_ALIASES.streetlights.includes(rawDept)) return "streetlights";
       return rawDept;
     }
 
@@ -101,21 +93,6 @@ export default function GovQueue(props) {
       return "garbage";
     }
     if (
-      emailStr.includes("bhosale") ||
-      emailStr.includes("drain") ||
-      nameStr.includes("bhosale")
-    ) {
-      return "drainage";
-    }
-    if (
-      emailStr.includes("jadhav") ||
-      emailStr.includes("light") ||
-      emailStr.includes("street") ||
-      nameStr.includes("jadhav")
-    ) {
-      return "streetlights";
-    }
-    if (
       emailStr.includes("kulkarni") ||
       emailStr.includes("pothole") ||
       nameStr.includes("kulkarni")
@@ -123,7 +100,7 @@ export default function GovQueue(props) {
       return "potholes";
     }
     if (user?.role === "official" || userRole === "official") {
-      return "garbage";
+      return "potholes";
     }
     return null;
   }, [user, userRole, rawDept, emailStr, nameStr]);
@@ -295,10 +272,8 @@ export default function GovQueue(props) {
         <div className="flex gap-2 flex-wrap items-center">
           {[
             { id: "all", label: t("cat_all") || "All Queues", dot: "bg-slate-400" },
-            { id: "potholes", label: "Roads & Potholes", dot: "bg-[#EF4444]" },
-            { id: "garbage", label: "Solid Waste / Garbage", dot: "bg-[#10B981]" },
-            { id: "drainage", label: "Water & Drainage", dot: "bg-[#06B6D4]" },
-            { id: "streetlights", label: "Electrical / Streetlight", dot: "bg-[#F59E0B]" },
+            { id: "potholes", label: "Roads & Infrastructure", dot: "bg-[#EF4444]" },
+            { id: "garbage", label: "Solid Waste Management", dot: "bg-[#10B981]" },
           ].map((tab) => {
             const isSelected = dept === tab.id;
             return (

@@ -91,12 +91,6 @@ export function matchesCategory(itemCat, filterCat) {
   if (filter === "garbage" || filter === "solid_waste") {
     return ["garbage", "solid_waste", "sanitation", "waste"].includes(normalized);
   }
-  if (filter === "streetlights" || filter === "streetlight") {
-    return ["streetlights", "streetlight", "electrical", "electricity", "lighting"].includes(normalized);
-  }
-  if (filter === "drainage" || filter === "water") {
-    return ["drainage", "water", "waterlogging", "sewage", "flooding"].includes(normalized);
-  }
   return normalized === filter;
 }
 
@@ -159,8 +153,6 @@ export default function LiveLeafletMap({
               <option value="all">{t("cat_all")}</option>
               <option value="potholes">Road &amp; Potholes</option>
               <option value="garbage">Solid Waste / Garbage</option>
-              <option value="streetlights">Electrical / Streetlights</option>
-              <option value="drainage">Water &amp; Drainage</option>
             </select>
 
             <span className="text-xs font-medium text-slate2 flex items-center gap-1 font-mono uppercase tracking-wider pl-2">
@@ -365,12 +357,6 @@ export default function LiveLeafletMap({
               </span>
               <span className="flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" /> {t("cat_garbage")}
-              </span>
-              <span className="flex items-center gap-1.5 font-medium">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#06B6D4]" /> {t("cat_drainage")}
-              </span>
-              <span className="flex items-center gap-1.5 font-medium">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /> {t("cat_streetlights") || "Streetlight"}
               </span>
             </div>
           )}
