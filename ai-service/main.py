@@ -151,11 +151,11 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
     # 1. Potholes & Road Cracks Detector (conf >= 0.50)
     if pothole_model:
         try:
-            p_res = pothole_model.predict(source=pil_img, conf=0.25, verbose=False)
+            p_res = pothole_model.predict(source=pil_img, conf=0.18, verbose=False)
             if p_res and len(p_res) > 0 and p_res[0].boxes:
                 for b in p_res[0].boxes:
                     conf = float(b.conf.item())
-                    if conf >= 0.25:
+                    if conf >= 0.18:
                         cls_id = int(b.cls.item())
                         cls_name = pothole_model.names.get(cls_id, "pothole")
                         xyxyn = b.xyxyn[0].tolist()
@@ -176,7 +176,7 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
             if g_res and len(g_res) > 0 and g_res[0].boxes:
                 for b in g_res[0].boxes:
                     conf = float(b.conf.item())
-                    if conf >= 0.25:
+                    if conf >= 0.18:
                         cls_id = int(b.cls.item())
                         cls_name = garbage_model.names.get(cls_id, "trash")
                         xyxyn = b.xyxyn[0].tolist()
@@ -257,9 +257,15 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
             "category": None
         }
 
-    # Sort candidates by confidence (highest confidence primary detection)
-    candidates.sort(key=lambda c: c["confidence"], reverse=True)
-    primary = candidates[0]
+    # Disambiguation: If Garbage model detects solid waste (>=0.30), prioritize Garbage
+    # because road-only pothole models often misclassify textured trash piles as potholes
+    garbage_hits = [c for c in candidates if c["category"] == "Garbage" and c["confidence"] >= 0.30]
+    if garbage_hits:
+        garbage_hits.sort(key=lambda c: c["confidence"], reverse=True)
+        primary = garbage_hits[0]
+    else:
+        candidates.sort(key=lambda c: c["confidence"], reverse=True)
+        primary = candidates[0]
 
     xmin, ymin, xmax, ymax = primary["xyxyn"]
     left_pct = round(max(0.0, min(99.0, xmin * 100.0)), 1)
