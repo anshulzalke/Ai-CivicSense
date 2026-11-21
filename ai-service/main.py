@@ -172,7 +172,7 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
     # 2. Solid Waste & Garbage Detector (conf >= 0.50)
     if garbage_model:
         try:
-            g_res = garbage_model.predict(source=pil_img, conf=0.25, verbose=False)
+            g_res = garbage_model.predict(source=pil_img, conf=0.15, verbose=False)
             if g_res and len(g_res) > 0 and g_res[0].boxes:
                 for b in g_res[0].boxes:
                     conf = float(b.conf.item())
@@ -259,7 +259,7 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
 
     # Disambiguation: If Garbage model detects solid waste (>=0.30), prioritize Garbage
     # because road-only pothole models often misclassify textured trash piles as potholes
-    garbage_hits = [c for c in candidates if c["category"] == "Garbage" and c["confidence"] >= 0.30]
+    garbage_hits = [c for c in candidates if c["category"] == "Garbage" and c["confidence"] >= 0.15]
     if garbage_hits:
         garbage_hits.sort(key=lambda c: c["confidence"], reverse=True)
         primary = garbage_hits[0]
