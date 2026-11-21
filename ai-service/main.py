@@ -169,24 +169,32 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
         except Exception as pe:
             print(f"⚠️ Pothole detection error: {pe}")
 
-    # 2. Solid Waste & Garbage Detector (conf >= 0.50)
+    # 2. Solid Waste & Garbage Detector (merges multi-class trash: plastic, paper, cardboard, metal, glass, trash)
     if garbage_model:
         try:
             g_res = garbage_model.predict(source=pil_img, conf=0.15, verbose=False)
+            g_boxes = []
             if g_res and len(g_res) > 0 and g_res[0].boxes:
                 for b in g_res[0].boxes:
                     conf = float(b.conf.item())
-                    if conf >= 0.18:
+                    if conf >= 0.15:
                         cls_id = int(b.cls.item())
                         cls_name = garbage_model.names.get(cls_id, "trash")
-                        xyxyn = b.xyxyn[0].tolist()
-                        candidates.append({
-                            "category": "Garbage",
-                            "raw_class": cls_name,
-                            "confidence": conf,
-                            "xyxyn": xyxyn,
-                            "model": "garbage_best"
-                        })
+                        g_boxes.append((conf, cls_name, b.xyxyn[0].tolist()))
+            if g_boxes:
+                g_boxes.sort(key=lambda x: x[0], reverse=True)
+                xmin = min(x[2][0] for x in g_boxes)
+                ymin = min(x[2][1] for x in g_boxes)
+                xmax = max(x[2][2] for x in g_boxes)
+                ymax = max(x[2][3] for x in g_boxes)
+                boosted_conf = min(0.96, g_boxes[0][0] + 0.15 * min(len(g_boxes), 3))
+                candidates.append({
+                    "category": "Garbage",
+                    "raw_class": g_boxes[0][1],
+                    "confidence": boosted_conf,
+                    "xyxyn": [xmin, ymin, xmax, ymax],
+                    "model": "garbage_best"
+                })
         except Exception as ge:
             print(f"⚠️ Garbage detection error: {ge}")
 
