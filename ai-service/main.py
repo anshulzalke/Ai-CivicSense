@@ -190,6 +190,41 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
         except Exception as ge:
             print(f"⚠️ Garbage detection error: {ge}")
 
+    # 2B. YOLOv8 General COCO Waste & Litter Detection (bottles, bags, packaging, food waste)
+    if general_model:
+        try:
+            waste_classes = {
+                "bottle", "cup", "bowl", "banana", "apple", "sandwich",
+                "orange", "donut", "cake", "handbag", "backpack", "suitcase",
+                "fork", "knife", "spoon", "wine glass"
+            }
+            w_res = general_model.predict(source=pil_img, conf=0.18, verbose=False)
+            waste_boxes = []
+            if w_res and len(w_res) > 0 and w_res[0].boxes:
+                for b in w_res[0].boxes:
+                    conf = float(b.conf.item())
+                    cls_id = int(b.cls.item())
+                    cls_name = general_model.names.get(cls_id, "")
+                    if cls_name in waste_classes and conf >= 0.18:
+                        waste_boxes.append((conf, cls_name, b.xyxyn[0].tolist()))
+            if waste_boxes:
+                waste_boxes.sort(key=lambda x: x[0], reverse=True)
+                # Merge bounding boxes of all detected waste items into one garbage zone
+                xmin = min(x[2][0] for x in waste_boxes)
+                ymin = min(x[2][1] for x in waste_boxes)
+                xmax = max(x[2][2] for x in waste_boxes)
+                ymax = max(x[2][3] for x in waste_boxes)
+                boosted_conf = min(0.94, waste_boxes[0][0] + 0.15 * min(len(waste_boxes), 3))
+                candidates.append({
+                    "category": "Garbage",
+                    "raw_class": "garbage",
+                    "confidence": boosted_conf,
+                    "xyxyn": [xmin, ymin, xmax, ymax],
+                    "model": "yolov8_waste_detector"
+                })
+        except Exception as we:
+            print(f"⚠️ COCO waste detection error: {we}")
+
     # 3. Streetlight & Traffic Light Hazards (conf >= 0.50)
     if general_model:
         try:
