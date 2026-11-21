@@ -151,11 +151,11 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
     # 1. Potholes & Road Cracks Detector (conf >= 0.50)
     if pothole_model:
         try:
-            p_res = pothole_model.predict(source=pil_img, conf=0.50, verbose=False)
+            p_res = pothole_model.predict(source=pil_img, conf=0.25, verbose=False)
             if p_res and len(p_res) > 0 and p_res[0].boxes:
                 for b in p_res[0].boxes:
                     conf = float(b.conf.item())
-                    if conf >= 0.50:
+                    if conf >= 0.25:
                         cls_id = int(b.cls.item())
                         cls_name = pothole_model.names.get(cls_id, "pothole")
                         xyxyn = b.xyxyn[0].tolist()
@@ -172,11 +172,11 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
     # 2. Solid Waste & Garbage Detector (conf >= 0.50)
     if garbage_model:
         try:
-            g_res = garbage_model.predict(source=pil_img, conf=0.50, verbose=False)
+            g_res = garbage_model.predict(source=pil_img, conf=0.25, verbose=False)
             if g_res and len(g_res) > 0 and g_res[0].boxes:
                 for b in g_res[0].boxes:
                     conf = float(b.conf.item())
-                    if conf >= 0.50:
+                    if conf >= 0.25:
                         cls_id = int(b.cls.item())
                         cls_name = garbage_model.names.get(cls_id, "trash")
                         xyxyn = b.xyxyn[0].tolist()

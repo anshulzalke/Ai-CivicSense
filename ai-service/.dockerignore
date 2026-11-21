@@ -1,0 +1,8 @@
+venv/
+.venv/
+dataset/
+test_samples/
+training_notebooks/
+runs/
+__pycache__/
+*.DS_Store
