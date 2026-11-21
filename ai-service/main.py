@@ -172,12 +172,12 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
     # 2. Solid Waste & Garbage Detector (merges multi-class trash: plastic, paper, cardboard, metal, glass, trash)
     if garbage_model:
         try:
-            g_res = garbage_model.predict(source=pil_img, conf=0.15, verbose=False)
+            g_res = garbage_model.predict(source=pil_img, conf=0.08, verbose=False)
             g_boxes = []
             if g_res and len(g_res) > 0 and g_res[0].boxes:
                 for b in g_res[0].boxes:
                     conf = float(b.conf.item())
-                    if conf >= 0.15:
+                    if conf >= 0.08:
                         cls_id = int(b.cls.item())
                         cls_name = garbage_model.names.get(cls_id, "trash")
                         g_boxes.append((conf, cls_name, b.xyxyn[0].tolist()))
@@ -300,9 +300,32 @@ def detect_civic_hazards(pil_img: Image.Image, np_img: np.ndarray) -> dict:
             "category": None
         }
 
+    # 2C. Bulk Garbage Pile / Polythene Sack Cluster Check (prevents colorful trash heaps from being misclassified as grey road potholes)
+    pothole_hits = [c for c in candidates if c["category"] == "Potholes"]
+    if pothole_hits and not any(c["category"] == "Garbage" for c in candidates):
+        top_p = sorted(pothole_hits, key=lambda c: c["confidence"], reverse=True)[0]
+        x1, y1, x2, y2 = top_p["xyxyn"]
+        H, W = np_img.shape[:2]
+        px1, py1, px2, py2 = int(x1 * W), int(y1 * H), int(x2 * W), int(y2 * H)
+        crop = np_img[max(0, py1):min(H, py2), max(0, px1):min(W, px2)]
+        if crop.size > 0:
+            hsv_crop = cv2.cvtColor(crop, cv2.COLOR_RGB2HSV)
+            sat = hsv_crop[:, :, 1]
+            val = hsv_crop[:, :, 2]
+            vivid_ratio = float(np.mean((sat > 85) & (val > 60)))
+            bright_white_ratio = float(np.mean((sat < 45) & (val > 205)))
+            if vivid_ratio > 0.12 or (vivid_ratio > 0.06 and bright_white_ratio > 0.15):
+                candidates.append({
+                    "category": "Garbage",
+                    "raw_class": "garbage",
+                    "confidence": round(min(0.94, max(0.76, top_p["confidence"])), 2),
+                    "xyxyn": top_p["xyxyn"],
+                    "model": "garbage_heap_classifier"
+                })
+
     # Disambiguation: If Garbage model detects solid waste (>=0.30), prioritize Garbage
     # because road-only pothole models often misclassify textured trash piles as potholes
-    garbage_hits = [c for c in candidates if c["category"] == "Garbage" and c["confidence"] >= 0.15]
+    garbage_hits = [c for c in candidates if c["category"] == "Garbage" and c["confidence"] >= 0.08]
     if garbage_hits:
         garbage_hits.sort(key=lambda c: c["confidence"], reverse=True)
         primary = garbage_hits[0]
